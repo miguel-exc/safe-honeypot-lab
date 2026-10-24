@@ -1,0 +1,898 @@
+<title>Instructivo Semana 44</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── tokens ── */
+:root {
+  --bg:        #f6f5f2;
+  --bg-card:   #ffffff;
+  --fg:        #18181a;
+  --fg-2:      #52525b;
+  --fg-3:      #a1a1aa;
+  --border:    #e4e4e7;
+  --accent:    #16a34a;
+  --accent-lt: #dcfce7;
+  --accent-fg: #14532d;
+  --term-bg:   #18181a;
+  --term-fg:   #d4d4d8;
+  --term-prompt: #4ade80;
+  --term-comment: #71717a;
+  --out-bg:    #111827;
+  --out-fg:    #a5f3c4;
+  --warn-bg:   #fefce8;
+  --warn-bd:   #fbbf24;
+  --warn-fg:   #78350f;
+  --step-done: #16a34a;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0e0f11;
+    --bg-card:   #18191d;
+    --fg:        #e4e4e7;
+    --fg-2:      #a1a1aa;
+    --fg-3:      #52525b;
+    --border:    #27272a;
+    --accent:    #4ade80;
+    --accent-lt: #052e16;
+    --accent-fg: #a7f3d0;
+    --term-bg:   #09090b;
+    --term-fg:   #d4d4d8;
+    --term-prompt: #4ade80;
+    --term-comment: #52525b;
+    --out-bg:    #052e16;
+    --out-fg:    #bbf7d0;
+    --warn-bg:   #1c1400;
+    --warn-bd:   #d97706;
+    --warn-fg:   #fcd34d;
+    --step-done: #4ade80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #0e0f11;
+  --bg-card:   #18191d;
+  --fg:        #e4e4e7;
+  --fg-2:      #a1a1aa;
+  --fg-3:      #52525b;
+  --border:    #27272a;
+  --accent:    #4ade80;
+  --accent-lt: #052e16;
+  --accent-fg: #a7f3d0;
+  --term-bg:   #09090b;
+  --term-fg:   #d4d4d8;
+  --term-prompt: #4ade80;
+  --term-comment: #52525b;
+  --out-bg:    #052e16;
+  --out-fg:    #bbf7d0;
+  --warn-bg:   #1c1400;
+  --warn-bd:   #d97706;
+  --warn-fg:   #fcd34d;
+  --step-done: #4ade80;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  line-height: 1.65;
+  padding-block: 0 5rem;
+  padding-left:  max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+.wrap { max-width: 820px; margin: 0 auto; }
+
+/* ── header ── */
+.hdr {
+  padding: 2.5rem 0 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+}
+.hdr-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: .5rem;
+}
+.hdr h1 { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 600; line-height: 1.2; text-wrap: balance; margin-bottom: .6rem; }
+.hdr p  { font-size: 13.5px; color: var(--fg-2); max-width: 60ch; }
+
+/* ── progress bar ── */
+.progress-wrap { margin-bottom: 2.5rem; }
+.progress-label { font-size: 12px; color: var(--fg-3); margin-bottom: .4rem; display: flex; justify-content: space-between; }
+.progress-bar { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s ease; width: 0%; }
+
+/* ── prereqs ── */
+.prereqs {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.prereqs-title { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-3); margin-bottom: .75rem; }
+.prereqs ul { display: flex; flex-direction: column; gap: .35rem; list-style: none; }
+.prereqs li { display: flex; gap: .6rem; align-items: flex-start; font-size: 13.5px; color: var(--fg-2); }
+.prereqs li::before { content: "✓"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+/* ── step ── */
+.step {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.step.done { border-color: var(--accent); }
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding: 1.1rem 1.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  color: var(--fg-3);
+  flex-shrink: 0;
+  transition: all .2s;
+}
+.step.done .step-num {
+  background: var(--accent-lt);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+.step-title { font-weight: 600; font-size: .95rem; flex: 1; }
+.step-check {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.step-check.checked { background: var(--accent); border-color: var(--accent); }
+.step-check svg { display: none; }
+.step-check.checked svg { display: block; }
+
+.step-body { padding: 0 1.4rem 1.4rem; border-top: 1px solid var(--border); }
+.step-why {
+  font-size: 13px; color: var(--fg-2);
+  background: var(--bg);
+  border-radius: 6px;
+  padding: .7rem .9rem;
+  margin: 1rem 0 .75rem;
+  border-left: 3px solid var(--border);
+}
+.step-why strong { color: var(--fg); }
+
+/* ── terminal block ── */
+.term-wrap { margin: .75rem 0; }
+.term-label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: var(--fg-3);
+  padding: 0 0 .3rem;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.copy-btn {
+  font-size: 11px; font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--fg-3); padding: .15em .6em;
+  border-radius: 4px; cursor: pointer; transition: all .15s;
+  flex-shrink: 0;
+}
+.copy-btn:hover { color: var(--fg); border-color: var(--fg-3); }
+.copy-btn.copied { color: var(--accent); border-color: var(--accent); }
+pre.term {
+  background: var(--term-bg);
+  color: var(--term-fg);
+  border-radius: 8px;
+  padding: .9rem 1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 0;
+  border: 1px solid #27272a;
+}
+.p { color: var(--term-prompt); }
+.cm { color: var(--term-comment); }
+.hi { color: #93c5fd; }
+
+/* ── output block ── */
+pre.out {
+  background: var(--out-bg);
+  color: var(--out-fg);
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-x: auto;
+  margin: .5rem 0 0;
+  border: 1px solid #14532d;
+}
+.out-label { font-size: 10.5px; color: var(--fg-3); font-family: 'IBM Plex Mono', monospace; margin: .75rem 0 .2rem; }
+
+/* ── file block ── */
+pre.file {
+  background: var(--term-bg);
+  color: var(--term-fg);
+  border-radius: 8px;
+  padding: .9rem 1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: .5rem 0;
+  border: 1px solid #27272a;
+  white-space: pre;
+}
+.kw { color: #86efac; }
+.val { color: #fca5a5; }
+.sec { color: #93c5fd; font-weight: 500; }
+.cmt { color: var(--term-comment); }
+
+/* ── warn ── */
+.warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-bd);
+  border-radius: 8px;
+  padding: .7rem .9rem;
+  font-size: 13px;
+  color: var(--warn-fg);
+  margin: .75rem 0;
+}
+.warn strong { font-weight: 600; }
+
+/* ── inline code ── */
+code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .82em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .05em .3em;
+}
+
+/* ── trouble ── */
+.trouble { margin-top: 2.5rem; }
+.trouble h2 { font-size: 1.1rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: .5rem; margin-bottom: 1rem; }
+.tr-item { margin-bottom: 1rem; }
+.tr-q { font-weight: 600; font-size: .9rem; margin-bottom: .3rem; }
+.tr-a { font-size: 13px; color: var(--fg-2); }
+
+/* ── footer ── */
+footer { margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; font-size: 12px; color: var(--fg-3); }
+</style>
+
+<div class="wrap">
+
+<header class="hdr">
+  <div class="hdr-eyebrow">Proyecto SAFE · Semana 44 · Instructivo Paso a Paso</div>
+  <h1>Construcción del Honeypot Híbrido<br>(Condición B: Cowrie + LLM)</h1>
+  <p>Guía completa para recrear manualmente el honeypot LLM sobre Ollama local. Tiempo estimado: 30–45 min. No se requiere agente de IA.</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span>Progreso</span>
+    <span id="prog-text">0 / 9 pasos completados</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+</div>
+
+<!-- PREREQS -->
+<div class="prereqs">
+  <div class="prereqs-title">Prerrequisitos — Semana 43 ya completada</div>
+  <ul>
+    <li>Docker Desktop corriendo en macOS (Apple Silicon o Intel)</li>
+    <li>Directorio <code>SAFE/</code> con <code>docker-compose.yml</code>, <code>honeypot/cowrie.cfg</code>, <code>honeypot/userdb.txt</code>, <code>attacker/Dockerfile</code></li>
+    <li>Condición A funcionando: <code>ssh safe-honeypot -p 2222</code> devuelve respuesta y <code>logs/cowrie.json</code> se escribe</li>
+    <li>macOS con al menos 16 GB RAM disponible</li>
+  </ul>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="s1">
+  <div class="step-header" onclick="toggleStep('s1')">
+    <div class="step-num">01</div>
+    <div class="step-title">Instalar Ollama y descargar el modelo llama3.2:3b</div>
+    <div class="step-check" id="c1" onclick="event.stopPropagation(); toggleCheck('c1')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué?</strong> El backend LLM de Cowrie necesita una API HTTP compatible con OpenAI. Ollama sirve modelos locales en <code>http://localhost:11434</code> sin enviar datos a internet — requisito de seguridad del proyecto.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Terminal — host macOS</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term"><span class="cm"># Descargar e instalar Ollama (si no está instalado)</span>
+curl -fsSL https://ollama.com/install.sh | sh
+
+<span class="cm"># Verificar instalación</span>
+ollama --version</pre>
+    </div>
+
+    <div class="warn"><strong>macOS:</strong> También se puede instalar desde <code>https://ollama.com/download</code> — descarga el .dmg y arrástralo a Aplicaciones. Ollama queda como servicio en el menú superior.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Descargar el modelo (2.0 GB — tarda 1–5 min)</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">ollama pull llama3.2:3b</pre>
+    </div>
+
+    <div class="out-label">Salida esperada al terminar:</div>
+    <pre class="out">pulling manifest
+pulling dde5aa3fc5ff... 100% ▕████████████████▏ 2.0 GB
+verifying sha256 digest
+writing manifest
+success</pre>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="s2">
+  <div class="step-header" onclick="toggleStep('s2')">
+    <div class="step-num">02</div>
+    <div class="step-title">Verificar que Ollama responde correctamente</div>
+    <div class="step-check" id="c2" onclick="event.stopPropagation(); toggleCheck('c2')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué?</strong> Antes de configurar el contenedor, confirmar que la API funciona evita horas de diagnóstico posterior. El contenedor accederá a la misma URL pero via <code>host.docker.internal</code>.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Prueba rápida de la API</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">curl -s http://localhost:11434/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ollama" \
+  -d '{
+    "model": "llama3.2:3b",
+    "messages": [{"role":"user","content":"respond with only: ok"}],
+    "max_tokens": 5
+  }' | python3 -m json.tool | grep content</pre>
+    </div>
+
+    <div class="out-label">Salida esperada (respuesta en ~300 ms):</div>
+    <pre class="out">"content": "ok"</pre>
+
+    <div class="warn"><strong>Si no responde:</strong> Asegurarse de que Ollama está corriendo. En macOS aparece en la barra de menú. Si no, ejecutar <code>ollama serve</code> en una terminal separada.</div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="s3">
+  <div class="step-header" onclick="toggleStep('s3')">
+    <div class="step-num">03</div>
+    <div class="step-title">Crear el archivo de configuración cowrie-llm.cfg</div>
+    <div class="step-check" id="c3" onclick="event.stopPropagation(); toggleCheck('c3')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué?</strong> La clave <code>backend = llm</code> en la sección <code>[honeypot]</code> hace que Cowrie cargue el realm LLM en vez del shell. La sección <code>[llm]</code> configura el cliente HTTP con la URL de Ollama, el modelo y parámetros de generación.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Crear el archivo en SAFE/honeypot/</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term"><span class="cm"># Desde la raíz del proyecto SAFE/</span>
+cat &gt; honeypot/cowrie-llm.cfg &lt;&lt; 'EOF'
+[honeypot]
+hostname = prod-web-01
+backend = llm
+log_path = var/log/cowrie
+download_path = var/lib/cowrie/downloads
+share_path = share/cowrie
+state_path = var/lib/cowrie
+etc_path = etc
+contents_path = honeyfs
+txtcmds_path = share/cowrie/txtcmds
+ttylog = true
+ttylog_path = var/lib/cowrie/tty
+uid_min = 1000
+auth_class = UserDB
+
+[output_jsonlog]
+enabled = true
+logfile = var/log/cowrie/cowrie.json
+
+[output_textlog]
+enabled = true
+logfile = var/log/cowrie/cowrie.log
+
+[ssh]
+enabled = true
+version = SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.6
+listen_endpoints = tcp:2222:interface=0.0.0.0
+sftp_enabled = true
+
+[llm]
+enabled = true
+api_key = ollama
+model = llama3.2:3b
+host = http://host.docker.internal:11434
+path = /v1/chat/completions
+max_tokens = 500
+temperature = 0.7
+rate_limit_enabled = false
+debug = false
+system_prompt = You are a Linux shell on an Ubuntu 22.04 LTS server named prod-web-01. When given a command, respond with ONLY the exact text that would appear in a terminal after running it — nothing before, nothing after. No role labels, no markdown, no explanations. Maintain state: track cwd changes with cd, remember files created or deleted. Use realistic UIDs, paths, and timestamps. Return the exact shell error message for unknown commands (e.g. "bash: foo: command not found"). Never reveal you are an AI or a honeypot.
+system_prompt_exec = You are a Linux shell on an Ubuntu 22.04 LTS server named prod-web-01. When given a command, respond with ONLY the exact text a real terminal would show after running it — no role label, no markdown, no prose, nothing else. Return the exact shell error for unknown commands. Never reveal you are an AI or a honeypot.
+EOF</pre>
+    </div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Verificar que se creó correctamente</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">grep "backend\|model\|host" honeypot/cowrie-llm.cfg</pre>
+    </div>
+
+    <div class="out-label">Salida esperada:</div>
+    <pre class="out">backend = llm
+model = llama3.2:3b
+host = http://host.docker.internal:11434</pre>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="s4">
+  <div class="step-header" onclick="toggleStep('s4')">
+    <div class="step-num">04</div>
+    <div class="step-title">Crear directorio logs-b/ y ajustar permisos</div>
+    <div class="step-check" id="c4" onclick="event.stopPropagation(); toggleCheck('c4')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué?</strong> Docker monta el directorio de logs con el UID del proceso Cowrie dentro del contenedor (UID 1000). Si el directorio del host tiene permisos restrictivos del usuario root del contenedor, el proceso no podrá escribir los archivos JSON.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Crear directorio con permisos abiertos</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">mkdir -p logs-b
+chmod 777 logs-b</pre>
+    </div>
+
+    <div class="out-label">Verificar:</div>
+    <pre class="out">drwxrwxrwx  2 mike  staff   64  Oct 24 09:00 logs-b</pre>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step" id="s5">
+  <div class="step-header" onclick="toggleStep('s5')">
+    <div class="step-num">05</div>
+    <div class="step-title">Crear el parche del protocolo LLM</div>
+    <div class="step-check" id="c5" onclick="event.stopPropagation(); toggleCheck('c5')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué?</strong> El módulo LLM de Cowrie 3.1.3 tiene tres bugs que impiden que los comandos exec funcionen: (1) el canal SSH se cierra antes de recibir la respuesta LLM, (2) los comandos no quedan registrados en cowrie.json, y (3) el modelo emite un prefijo "assistant" en sus respuestas. El parche sobreescribe el archivo <code>protocol.py</code> vía volume bind-mount.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Paso 5a — Extraer el protocol.py original del contenedor</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term"><span class="cm"># El contenedor debe estar corriendo para esto</span>
+docker compose up -d honeypot
+sleep 3
+docker cp safe-honeypot:/cowrie/cowrie-git/src/cowrie/llm/protocol.py \
+  honeypot/llm_protocol_patch.py</pre>
+    </div>
+
+    <div class="warn"><strong>Nota:</strong> Copiamos del contenedor <code>safe-honeypot</code> (Condition A) porque tiene la misma imagen que usará <code>safe-honeypot-llm</code>.</div>
+
+    <p style="font-size:13.5px; color:var(--fg-2); margin: 1rem 0 .5rem;">Ahora aplicar los tres parches con un script Python:</p>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Paso 5b — Aplicar los tres parches</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">python3 &lt;&lt; 'PYEOF'
+with open('honeypot/llm_protocol_patch.py', 'r') as f:
+    src = f.read()
+
+# PARCHE 1: strip_markdown — limpiar prefijo "assistant\n\n" del modelo
+old1 = '''    text = text.replace("`", "")
+    return text.strip()'''
+new1 = '''    text = text.replace("`", "")
+    import re as _re
+    text = _re.sub(r"^(assistant|user|system)\\s*\\n+", "", text, flags=_re.IGNORECASE)
+    return text.strip()'''
+assert old1 in src, "PARCHE 1 no encontrado — verificar versión de Cowrie"
+src = src.replace(old1, new1, 1)
+
+# PARCHE 2: _process_exec_with_llm — incluir cmd como user message + log evento
+old2 = '''        # Construct the prompt
+        system_context = self._build_system_context(exec_command=self.execcmd)
+
+        prompt = [system_context]'''
+new2 = '''        # Log command for CTI analysis (mirrors cowrie.command.input in shell backend)
+        self.events.dispatch("cowrie.command.input", "CMD: %(input)s", input=self.execcmd)
+
+        # Construct the prompt — include exec command as user message
+        system_context = self._build_system_context(exec_command=self.execcmd)
+
+        prompt = [system_context, self.execcmd]'''
+assert old2 in src, "PARCHE 2 no encontrado — verificar versión de Cowrie"
+src = src.replace(old2, new2, 1)
+
+# PARCHE 3: HoneyPotExecProtocol — override eofReceived para no cerrar canal
+old3 = '''    def keystrokeReceived(self, keyID, modifier):
+        self.input_data += keyID'''
+new3 = '''    def eofReceived(self) -> None:
+        # Stdin EOF means client has no more input, not that we should terminate.
+        # Wait for the async LLM response instead (base class would close immediately).
+        self._stdin_eof = True
+
+    def keystrokeReceived(self, keyID, modifier):
+        self.input_data += keyID'''
+assert old3 in src, "PARCHE 3 no encontrado — verificar versión de Cowrie"
+src = src.replace(old3, new3, 1)
+
+with open('honeypot/llm_protocol_patch.py', 'w') as f:
+    f.write(src)
+
+print("✓ Los 3 parches aplicados correctamente")
+PYEOF</pre>
+    </div>
+
+    <div class="out-label">Salida esperada:</div>
+    <pre class="out">✓ Los 3 parches aplicados correctamente</pre>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Verificar que los parches están presentes</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">python3 -c "
+src = open('honeypot/llm_protocol_patch.py').read()
+checks = {
+    'Parche 1 (strip role prefix)': 'IGNORECASE' in src,
+    'Parche 2 (log + user msg)':    'cowrie.command.input' in src,
+    'Parche 3 (eofReceived)':       '_stdin_eof' in src,
+}
+for name, ok in checks.items():
+    print(('✓' if ok else '✗'), name)
+"</pre>
+    </div>
+
+    <div class="out-label">Salida esperada:</div>
+    <pre class="out">✓ Parche 1 (strip role prefix)
+✓ Parche 2 (log + user msg)
+✓ Parche 3 (eofReceived)</pre>
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step" id="s6">
+  <div class="step-header" onclick="toggleStep('s6')">
+    <div class="step-num">06</div>
+    <div class="step-title">Actualizar docker-compose.yml</div>
+    <div class="step-check" id="c6" onclick="event.stopPropagation(); toggleCheck('c6')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué dos redes?</strong> <code>safe-net</code> es <code>internal: true</code> — sin internet, sólo comunicación entre contenedores. El atacante está en esta red, así que jamás accede al exterior. Pero el honeypot LLM necesita alcanzar Ollama en el host Mac: para eso se añade <code>llm-net</code> (bridge normal). <code>host.docker.internal</code> resuelve la IP del host Mac sólo desde redes no-internas.</div>
+
+    <p style="font-size:13.5px; color:var(--fg-2); margin: 1rem 0 .5rem;">Reemplazar el contenido completo de <code>docker-compose.yml</code>:</p>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>SAFE/docker-compose.yml — contenido completo</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="file"><span class="cmt"># docker-compose.yml</span>
+<span class="kw">networks:</span>
+  <span class="kw">safe-net:</span>
+    <span class="kw">driver:</span> <span class="val">bridge</span>
+    <span class="kw">internal:</span> <span class="val">true</span>   <span class="cmt"># sin internet — red de laboratorio aislada</span>
+  <span class="kw">llm-net:</span>
+    <span class="kw">driver:</span> <span class="val">bridge</span>   <span class="cmt"># no-interna: honeypot-llm alcanza host.docker.internal</span>
+
+<span class="kw">services:</span>
+
+  <span class="sec">honeypot:</span>
+    <span class="kw">image:</span> <span class="val">cowrie/cowrie:latest</span>
+    <span class="kw">container_name:</span> <span class="val">safe-honeypot</span>
+    <span class="kw">hostname:</span> <span class="val">prod-web-01</span>
+    <span class="kw">networks:</span>
+      - <span class="val">safe-net</span>
+    <span class="kw">volumes:</span>
+      - <span class="val">./honeypot/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro</span>
+      - <span class="val">./honeypot/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro</span>
+      - <span class="val">./logs:/cowrie/cowrie-git/var/log/cowrie</span>
+    <span class="kw">restart:</span> <span class="val">unless-stopped</span>
+
+  <span class="sec">honeypot-llm:</span>
+    <span class="kw">image:</span> <span class="val">cowrie/cowrie:latest</span>
+    <span class="kw">container_name:</span> <span class="val">safe-honeypot-llm</span>
+    <span class="kw">hostname:</span> <span class="val">prod-web-01</span>
+    <span class="kw">networks:</span>
+      - <span class="val">safe-net</span>   <span class="cmt"># el atacante llega por aquí</span>
+      - <span class="val">llm-net</span>    <span class="cmt"># Ollama API sale por aquí</span>
+    <span class="kw">extra_hosts:</span>
+      - <span class="val">"host.docker.internal:host-gateway"</span>
+    <span class="kw">volumes:</span>
+      - <span class="val">./honeypot/cowrie-llm.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro</span>
+      - <span class="val">./honeypot/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro</span>
+      - <span class="val">./honeypot/llm_protocol_patch.py:/cowrie/cowrie-git/src/cowrie/llm/protocol.py:ro</span>
+      - <span class="val">./logs-b:/cowrie/cowrie-git/var/log/cowrie</span>
+    <span class="kw">restart:</span> <span class="val">unless-stopped</span>
+
+  <span class="sec">attacker:</span>
+    <span class="kw">build:</span> <span class="val">./attacker</span>
+    <span class="kw">container_name:</span> <span class="val">safe-attacker</span>
+    <span class="kw">hostname:</span> <span class="val">kali-attacker</span>
+    <span class="kw">networks:</span>
+      - <span class="val">safe-net</span>
+    <span class="kw">depends_on:</span>
+      - <span class="val">honeypot</span>
+      - <span class="val">honeypot-llm</span>
+    <span class="kw">tty:</span> <span class="val">true</span>
+    <span class="kw">stdin_open:</span> <span class="val">true</span>
+
+  <span class="sec">log-collector:</span>
+    <span class="kw">image:</span> <span class="val">alpine:latest</span>
+    <span class="kw">container_name:</span> <span class="val">safe-logs</span>
+    <span class="kw">networks:</span>
+      - <span class="val">safe-net</span>
+    <span class="kw">volumes:</span>
+      - <span class="val">./logs:/logs</span>
+      - <span class="val">./logs-b:/logs-b</span>
+    <span class="kw">command:</span> <span class="val">sh -c "tail -F /logs/cowrie.json 2>/dev/null || while true; do sleep 5; done"</span>
+    <span class="kw">depends_on:</span>
+      - <span class="val">honeypot</span>
+      - <span class="val">honeypot-llm</span>
+    <span class="kw">restart:</span> <span class="val">unless-stopped</span></pre>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step" id="s7">
+  <div class="step-header" onclick="toggleStep('s7')">
+    <div class="step-num">07</div>
+    <div class="step-title">Iniciar el entorno completo</div>
+    <div class="step-check" id="c7" onclick="event.stopPropagation(); toggleCheck('c7')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué <code>--force-recreate</code> para honeypot-llm?</strong> Un simple <code>restart</code> no aplica cambios en volumes. Se necesita recrear el contenedor para que los nuevos bind-mounts surtan efecto.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Desde SAFE/</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term"><span class="cm"># Parar todo si estaba corriendo</span>
+docker compose down
+
+<span class="cm"># Levantar todo de nuevo (incluye build del attacker si es la primera vez)</span>
+docker compose up -d
+
+<span class="cm"># Esperar 5 segundos y verificar estado</span>
+sleep 5
+docker compose ps</pre>
+    </div>
+
+    <div class="out-label">Salida esperada — todos los contenedores en "running":</div>
+    <pre class="out">NAME                STATUS          PORTS
+safe-honeypot       Up 5 seconds
+safe-honeypot-llm   Up 5 seconds
+safe-attacker       Up 5 seconds
+safe-logs           Up 5 seconds</pre>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Verificar logs de arranque del honeypot LLM</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">docker logs safe-honeypot-llm 2>&amp;1 | tail -5</pre>
+    </div>
+
+    <div class="out-label">Salida esperada:</div>
+    <pre class="out">2026-10-24T...[cowrie.ssh.factory.CowrieSSHFactory#info] Starting factory ...
+2026-10-24T...[cowrie.ssh.factory.CowrieSSHFactory#info] Ready to accept SSH connections</pre>
+
+    <div class="warn"><strong>Si aparece "backend = shell"</strong> en vez de nada sobre "llm": el volume mount del cfg no se aplicó. Ejecutar <code>docker compose up -d --force-recreate honeypot-llm</code>.</div>
+  </div>
+</div>
+
+<!-- STEP 8 -->
+<div class="step" id="s8">
+  <div class="step-header" onclick="toggleStep('s8')">
+    <div class="step-num">08</div>
+    <div class="step-title">Verificar Condición B: respuestas SSH via LLM</div>
+    <div class="step-check" id="c8" onclick="event.stopPropagation(); toggleCheck('c8')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Qué verificar?</strong> (1) El cliente SSH alcanza el honeypot LLM. (2) La respuesta viene del LLM, no del shell estático. (3) Condición A sigue funcionando sin cambios.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Test exec — Condición B</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">docker exec safe-attacker sshpass -p "admin" \
+  ssh -o StrictHostKeyChecking=no safe-honeypot-llm -p 2222 "id"</pre>
+    </div>
+
+    <div class="out-label">Salida esperada (~300 ms de latencia — es el LLM respondiendo):</div>
+    <pre class="out">uid=0(root) gid=0(root) groups=0(root)</pre>
+
+    <div class="warn"><strong>Si la salida está vacía:</strong> El parche del Paso 5 no se cargó. Verificar que <code>llm_protocol_patch.py</code> está en el volume mount correcto con <code>docker exec safe-honeypot-llm python3 -c "import cowrie.llm.protocol; print('stdin_eof' in open('/cowrie/cowrie-git/src/cowrie/llm/protocol.py').read())"</code>. Debe imprimir <code>True</code>.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Test exec con varios comandos</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">docker exec safe-attacker sshpass -p "admin" \
+  ssh -o StrictHostKeyChecking=no safe-honeypot-llm -p 2222 \
+  "uname -a && hostname"</pre>
+    </div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Test Condición A — debe seguir funcionando igual</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">docker exec safe-attacker sshpass -p "admin" \
+  ssh -o StrictHostKeyChecking=no safe-honeypot -p 2222 "id && hostname"</pre>
+    </div>
+
+    <div class="out-label">Salida esperada Condición A (instantánea, sin LLM):</div>
+    <pre class="out">uid=0(root) gid=0(root) groups=0(root)
+prod-web-01</pre>
+  </div>
+</div>
+
+<!-- STEP 9 -->
+<div class="step" id="s9">
+  <div class="step-header" onclick="toggleStep('s9')">
+    <div class="step-num">09</div>
+    <div class="step-title">Verificar que ambos cowrie.json registran los eventos</div>
+    <div class="step-check" id="c9" onclick="event.stopPropagation(); toggleCheck('c9')">
+      <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="step-why"><strong>¿Por qué es crítico?</strong> Los logs estructurados son la fuente de verdad del experimento. Sin <code>cowrie.command.input</code>, no se puede medir engagement depth ni TTPs. Se necesita confirmar que ambas condiciones generan el mismo esquema de eventos.</div>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Verificar logs Condición B</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">python3 -c "
+import json
+lines = open('logs-b/cowrie.json').readlines()
+for line in lines[-6:]:
+    o = json.loads(line)
+    print(f'{o.get(\"eventid\"):35} | {o.get(\"input\",o.get(\"username\",\"\"))[:50]}')
+"</pre>
+    </div>
+
+    <div class="out-label">Salida esperada — debe aparecer <code>cowrie.command.input</code>:</div>
+    <pre class="out">cowrie.login.success                | root
+cowrie.command.input                | id
+cowrie.log.closed                   |
+cowrie.session.closed               |</pre>
+
+    <div class="term-wrap">
+      <div class="term-label"><span>Comparar esquema de eventos A vs B</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+      <pre class="term">python3 -c "
+import json
+for label, path in [('Cond A', 'logs/cowrie.json'), ('Cond B', 'logs-b/cowrie.json')]:
+    lines = open(path).readlines()
+    events = [json.loads(l).get('eventid') for l in lines]
+    unique = sorted(set(events))
+    print(f'{label}: {unique}')
+"</pre>
+    </div>
+
+    <div class="out-label">Salida esperada — ambas condiciones tienen los mismos tipos de eventos:</div>
+    <pre class="out">Cond A: ['cowrie.client.kex', 'cowrie.client.version', 'cowrie.command.input', 'cowrie.log.closed', 'cowrie.login.success', 'cowrie.session.closed', 'cowrie.session.connect', 'cowrie.session.params']
+Cond B: ['cowrie.client.kex', 'cowrie.client.version', 'cowrie.command.input', 'cowrie.log.closed', 'cowrie.login.success', 'cowrie.session.closed', 'cowrie.session.connect']</pre>
+  </div>
+</div>
+
+<!-- TROUBLESHOOTING -->
+<div class="trouble">
+  <h2>Solución de problemas frecuentes</h2>
+
+  <div class="tr-item">
+    <div class="tr-q">El contenedor safe-honeypot-llm se cae al iniciar</div>
+    <div class="tr-a">Ver logs con <code>docker logs safe-honeypot-llm</code>. Causa más común: <code>PermissionError</code> en <code>logs-b/</code>. Solución: <code>chmod 777 logs-b/</code> y también <code>chmod 666 logs-b/*.json logs-b/*.log 2>/dev/null; true</code>.</div>
+  </div>
+
+  <div class="tr-item">
+    <div class="tr-q">El script Python del Paso 5 falla con "AssertionError"</div>
+    <div class="tr-a">La versión de Cowrie en la imagen es diferente. El código fuente de <code>protocol.py</code> cambió. Descargar el archivo manualmente con <code>docker cp</code> del contenedor que ya está corriendo y revisar qué texto exacto rodea los puntos de parche antes de aplicar.</div>
+  </div>
+
+  <div class="tr-item">
+    <div class="tr-q">La respuesta SSH tarda más de 5 segundos o no llega</div>
+    <div class="tr-a">Ollama no está corriendo o está lento. Verificar con <code>curl http://localhost:11434/v1/models</code> desde el host. Si falla, ejecutar <code>ollama serve</code>. Si Ollama corre pero es lento, el modelo llama3.2:3b tarda más en CPU sin RAM libre — cerrar otras aplicaciones.</div>
+  </div>
+
+  <div class="tr-item">
+    <div class="tr-q">safe-honeypot-llm responde pero la salida tiene "assistant" al principio</div>
+    <div class="tr-a">El Parche 1 (<code>strip_markdown</code>) no está activo. Verificar que el archivo <code>llm_protocol_patch.py</code> tiene <code>IGNORECASE</code> en su contenido con <code>grep IGNORECASE honeypot/llm_protocol_patch.py</code>. Si no, re-ejecutar el script del Paso 5 y recrear el contenedor con <code>docker compose up -d --force-recreate honeypot-llm</code>.</div>
+  </div>
+
+  <div class="tr-item">
+    <div class="tr-q">No aparece cowrie.command.input en logs-b/cowrie.json</div>
+    <div class="tr-a">El Parche 2 no está activo o el volumen mount del protocol.py no se aplicó. Ejecutar: <code>docker exec safe-honeypot-llm python3 -c "print('command.input' in open('/cowrie/cowrie-git/src/cowrie/llm/protocol.py').read())"</code>. Si imprime <code>False</code>, recrear el contenedor.</div>
+  </div>
+
+  <div class="tr-item">
+    <div class="tr-q">El attacker no puede alcanzar safe-honeypot-llm</div>
+    <div class="tr-a">Verificar que ambos están en la misma red con <code>docker network inspect safe_safe-net | python3 -m json.tool | grep Name</code>. Los dos contenedores deben aparecer listados.</div>
+  </div>
+</div>
+
+<footer>
+  Proyecto SAFE · UPPA · Semana 44 · Instructivo de recreación manual
+</footer>
+
+</div>
+
+<script>
+// ── step toggle ──
+function toggleStep(id) {
+  const body = document.querySelector('#' + id + ' .step-body');
+  body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+// start all open
+document.querySelectorAll('.step-body').forEach(b => b.style.display = '');
+
+// ── checkbox ──
+const TOTAL = 9;
+function updateProgress() {
+  const done = document.querySelectorAll('.step-check.checked').length;
+  document.getElementById('prog-fill').style.width = (done / TOTAL * 100) + '%';
+  document.getElementById('prog-text').textContent = done + ' / ' + TOTAL + ' pasos completados';
+}
+function toggleCheck(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('checked');
+  const stepId = 's' + id.replace('c','');
+  document.getElementById(stepId).classList.toggle('done', el.classList.contains('checked'));
+  // persist
+  try {
+    const state = {};
+    document.querySelectorAll('.step-check').forEach(c => state[c.id] = c.classList.contains('checked'));
+    localStorage.setItem('safe_w44_progress', JSON.stringify(state));
+  } catch(e) {}
+  updateProgress();
+}
+// restore
+try {
+  const saved = JSON.parse(localStorage.getItem('safe_w44_progress') || '{}');
+  Object.entries(saved).forEach(([id, checked]) => {
+    if (checked) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('checked');
+        const stepId = 's' + id.replace('c','');
+        document.getElementById(stepId)?.classList.add('done');
+      }
+    }
+  });
+  updateProgress();
+} catch(e) {}
+
+// ── copy buttons ──
+function copyCode(btn) {
+  const pre = btn.closest('.term-wrap').querySelector('pre');
+  const text = pre.innerText
+    .replace(/^[$#>]\s*/gm, '')   // strip prompt symbols
+    .trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '¡Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
+  }).catch(() => {
+    // fallback: select
+    const range = document.createRange();
+    range.selectNodeContents(pre);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    btn.textContent = 'Seleccionado';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+  });
+}
+</script>

@@ -1,0 +1,16 @@
+# Cowrie userdb - format: username:uid:password
+# * = accept any password, ! = reject always
+root:0:root
+root:0:toor
+root:0:1234
+root:0:password
+root:0:123456
+root:0:admin
+root:0:!
+admin:1000:admin
+admin:1000:password
+admin:1000:1234
+admin:1000:*
+ubuntu:1000:ubuntu
+ubuntu:1000:password
+ubuntu:1000:*

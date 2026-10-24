@@ -1,0 +1,702 @@
+<title>SAFE — Informe Fase 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── tokens ──────────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #f8f7f5;
+  --bg-card:   #ffffff;
+  --fg:        #1a1a1a;
+  --fg-2:      #555;
+  --fg-3:      #888;
+  --accent:    #1a56db;
+  --accent-lt: #dbe8ff;
+  --border:    #e2e0dc;
+  --code-bg:   #f0eee9;
+  --tag-a:     #1a56db;
+  --tag-a-bg:  #dbe8ff;
+  --tag-b:     #7c3aed;
+  --tag-b-bg:  #ede9fe;
+  --ok:        #15803d;
+  --ok-bg:     #dcfce7;
+  --warn-bg:   #fefce8;
+  --warn:      #854d0e;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #111318;
+    --bg-card:   #1b1e27;
+    --fg:        #e8e6e0;
+    --fg-2:      #9a97a0;
+    --fg-3:      #5e5c66;
+    --accent:    #60a5fa;
+    --accent-lt: #1e3a5f;
+    --border:    #2a2d38;
+    --code-bg:   #252834;
+    --tag-a:     #60a5fa;
+    --tag-a-bg:  #1e3a5f;
+    --tag-b:     #a78bfa;
+    --tag-b-bg:  #2e1b55;
+    --ok:        #4ade80;
+    --ok-bg:     #052e16;
+    --warn-bg:   #1c1a07;
+    --warn:      #facc15;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #111318;
+  --bg-card:   #1b1e27;
+  --fg:        #e8e6e0;
+  --fg-2:      #9a97a0;
+  --fg-3:      #5e5c66;
+  --accent:    #60a5fa;
+  --accent-lt: #1e3a5f;
+  --border:    #2a2d38;
+  --code-bg:   #252834;
+  --tag-a:     #60a5fa;
+  --tag-a-bg:  #1e3a5f;
+  --tag-b:     #a78bfa;
+  --tag-b-bg:  #2e1b55;
+  --ok:        #4ade80;
+  --ok-bg:     #052e16;
+  --warn-bg:   #1c1a07;
+  --warn:      #facc15;
+  color-scheme: dark;
+}
+
+/* ── reset & base ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  padding-block: 0 4rem;
+  padding-left:  max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ── layout ──────────────────────────────────────────────────────────────── */
+.wrap { max-width: 780px; margin: 0 auto; }
+
+/* ── cover ───────────────────────────────────────────────────────────────── */
+.cover {
+  border-bottom: 2px solid var(--accent);
+  padding: 3.5rem 0 2.5rem;
+  margin-bottom: 3rem;
+}
+.cover-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .7rem;
+}
+.cover h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  text-wrap: balance;
+  margin-bottom: 1rem;
+}
+.cover-sub {
+  font-size: 1rem;
+  color: var(--fg-2);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+.cover-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.5rem;
+  font-size: 13px;
+  color: var(--fg-3);
+}
+.cover-meta strong { color: var(--fg-2); font-weight: 600; }
+
+/* ── toc ─────────────────────────────────────────────────────────────────── */
+.toc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 3rem;
+}
+.toc-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: .75rem;
+}
+.toc ol {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  counter-reset: toc;
+}
+.toc li { counter-increment: toc; display: flex; gap: .6rem; align-items: baseline; }
+.toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--fg-3);
+  flex-shrink: 0;
+}
+.toc a { color: var(--fg-2); text-decoration: none; font-size: 13.5px; }
+.toc a:hover { color: var(--accent); }
+
+/* ── sections ────────────────────────────────────────────────────────────── */
+section { margin-bottom: 3.5rem; }
+.section-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  line-height: 1.25;
+  text-wrap: balance;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--border);
+}
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.75rem 0 .6rem;
+  color: var(--fg);
+}
+p { margin-bottom: .9rem; color: var(--fg-2); max-width: 68ch; }
+p:last-child { margin-bottom: 0; }
+strong { color: var(--fg); font-weight: 600; }
+
+/* ── code ────────────────────────────────────────────────────────────────── */
+code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .82em;
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: .1em .35em;
+  color: var(--fg);
+}
+pre {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+/* ── decision cards ──────────────────────────────────────────────────────── */
+.decision-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+.decision {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+.decision-title {
+  font-weight: 600;
+  font-size: .95rem;
+  margin-bottom: .4rem;
+  color: var(--fg);
+}
+.decision-opted {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-radius: 20px;
+  padding: .15em .7em;
+  margin-bottom: .75rem;
+}
+.decision-rejected {
+  font-size: 12.5px;
+  color: var(--fg-3);
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: .5rem .75rem;
+  margin-top: .75rem;
+}
+.decision-rejected strong { color: var(--fg-2); }
+.decision p { font-size: 13.5px; }
+
+/* ── timeline ────────────────────────────────────────────────────────────── */
+.timeline { display: flex; flex-direction: column; gap: 0; margin-top: 1rem; }
+.tl-item { display: flex; gap: 1.25rem; }
+.tl-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 44px;
+}
+.tl-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: .35rem;
+}
+.tl-line { width: 2px; background: var(--border); flex: 1; margin-top: 4px; }
+.tl-item:last-child .tl-line { display: none; }
+.tl-week {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: .05em;
+  width: 44px;
+  flex-shrink: 0;
+  text-align: right;
+  padding-top: .05rem;
+}
+.tl-body { padding-bottom: 1.75rem; }
+.tl-body h4 { font-size: .9rem; font-weight: 600; margin-bottom: .3rem; }
+.tl-body ul { padding-left: 1.1rem; display: flex; flex-direction: column; gap: .2rem; }
+.tl-body li { font-size: 13.5px; color: var(--fg-2); }
+.tl-body li::marker { color: var(--accent); }
+
+/* ── bug cards ───────────────────────────────────────────────────────────── */
+.bug-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+.bug {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+}
+.bug-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--fg-3);
+  margin-bottom: .3rem;
+}
+.bug-title { font-weight: 600; font-size: .92rem; margin-bottom: .4rem; }
+.bug p { font-size: 13.5px; margin-bottom: .5rem; }
+
+/* ── status table ────────────────────────────────────────────────────────── */
+.status-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 13.5px; }
+.status-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  padding: .5rem .75rem;
+  border-bottom: 1px solid var(--border);
+}
+.status-table td { padding: .6rem .75rem; border-bottom: 1px solid var(--border); color: var(--fg-2); }
+.status-table tr:last-child td { border-bottom: none; }
+.status-table td:first-child { font-weight: 600; color: var(--fg); }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: .1em .65em;
+}
+.badge-a { background: var(--tag-a-bg); color: var(--tag-a); }
+.badge-b { background: var(--tag-b-bg); color: var(--tag-b); }
+
+/* ── concept box ─────────────────────────────────────────────────────────── */
+.concept {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+.concept h4 { font-size: .88rem; font-weight: 600; margin-bottom: .5rem; }
+.concept p { font-size: 13px; }
+.concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+
+/* ── arch diagram ────────────────────────────────────────────────────────── */
+.arch-wrap { overflow-x: auto; margin: 1rem 0; }
+
+/* ── footer ──────────────────────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+  font-size: 12px;
+  color: var(--fg-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 2rem;
+}
+</style>
+
+<div class="wrap">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="cover-eyebrow">Proyecto SAFE · Informe Técnico · Fase 1</div>
+    <h1>SOC del Futuro:<br>Honeypots Potenciados con IA</h1>
+    <p class="cover-sub">
+      Diseño e implementación del entorno experimental de laboratorio.<br>
+      Semanas 43–44 · Comparación Condición A (Cowrie shell) vs Condición B (Cowrie + LLM).
+    </p>
+    <div class="cover-meta">
+      <span><strong>Autores:</strong> Miguel E. Mendoza Chavarría &amp; Mario C. Velez Zamarrón</span>
+      <span><strong>Universidad:</strong> UPPA · Máster Seguridad Informática</span>
+      <span><strong>Fecha:</strong> Semana 44, octubre 2026</span>
+      <span><strong>Directorio:</strong> <code>Projects/SAFE/</code></span>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-label">Contenido</div>
+    <ol>
+      <li><a href="#background">Contexto técnico necesario para esta fase</a></li>
+      <li><a href="#historial">Historial de trabajo (semanas 43–44)</a></li>
+      <li><a href="#decisiones">Toma de decisiones y justificación de herramientas</a></li>
+      <li><a href="#hallazgos">Hallazgos técnicos y correcciones</a></li>
+      <li><a href="#estado">Estado actual del entorno</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. BACKGROUND -->
+  <section id="background">
+    <div class="section-label">Sección 01</div>
+    <h2>Contexto técnico necesario para esta fase</h2>
+
+    <h3>¿Qué es un honeypot SSH?</h3>
+    <p>
+      Un honeypot es un sistema señuelo diseñado para atraer a atacantes, registrar sus acciones y generar inteligencia de amenazas (CTI). Un honeypot SSH simula un servidor Linux accesible por SSH: acepta credenciales débiles, emula un shell interactivo y registra cada comando ejecutado. Su valor no radica en la respuesta que da al atacante, sino en los datos que recopila.
+    </p>
+    <p>
+      Los honeypots se clasifican por nivel de interacción: los <strong>de baja interacción</strong> simulan pocos servicios y responden de forma estática; los <strong>de alta interacción</strong> exponen un sistema real y capturan TTPs detallados pero son costosos y peligrosos. Los honeypots como Cowrie se ubican en el rango medio-alto: emulan un sistema completo con filesystem falso pero sin ejecutar código real.
+    </p>
+
+    <h3>Arquitectura de Cowrie</h3>
+    <div class="concept-grid">
+      <div class="concept">
+        <h4>Capa de transporte (SSH)</h4>
+        <p>Implementada con Twisted Conch. Negocia claves, cifrado y autenticación. Expone el puerto 2222 internamente. La versión del banner (<code>SSH-2.0-OpenSSH_8.9p1</code>) es configurable para fingerprinting realista.</p>
+      </div>
+      <div class="concept">
+        <h4>Realm y Avatar</h4>
+        <p>El <em>realm</em> decide qué "backend" maneja la sesión autenticada. En Cowrie hay dos: <code>shell</code> (filesystem emulado) y <code>llm</code> (respuestas generadas por LLM). El avatar encapsula identidad del usuario conectado.</p>
+      </div>
+      <div class="concept">
+        <h4>Shell emulado (backend shell)</h4>
+        <p>Implementa ~60 comandos Unix: <code>ls</code>, <code>cd</code>, <code>cat</code>, <code>wget</code>, <code>curl</code>, etc. sobre un filesystem virtual. Estado consistente entre comandos. Respuestas deterministas y rápidas.</p>
+      </div>
+      <div class="concept">
+        <h4>Output plugins</h4>
+        <p>Eventos JSON estructurados (<code>cowrie.json</code>) y texto plano (<code>cowrie.log</code>). Cada evento tiene <code>eventid</code>, <code>src_ip</code>, <code>sensor</code>, <code>timestamp</code>. Los IDs relevantes son: <code>cowrie.login.success</code>, <code>cowrie.command.input</code>, <code>cowrie.session.closed</code>.</p>
+      </div>
+    </div>
+
+    <h3>LLM backend en Cowrie (módulo experimental)</h3>
+    <p>
+      Cowrie 3.1.3 incluye un módulo experimental <code>cowrie/llm/</code> que reemplaza completamente el backend shell por respuestas generadas por un LLM. Cuando <code>backend = llm</code> está configurado, cada comando del atacante se envía como prompt a una API OpenAI-compatible y la respuesta se devuelve al terminal. El módulo incluye:
+    </p>
+    <ul style="padding-left:1.25rem; display:flex; flex-direction:column; gap:.3rem; margin:.5rem 0 1rem; color:var(--fg-2); font-size:13.5px;">
+      <li><code>llm.py</code> — cliente HTTP asíncrono (Twisted Agent) para APIs OpenAI/Anthropic</li>
+      <li><code>protocol.py</code> — protocolos de sesión interactiva (<code>HoneyPotInteractiveProtocol</code>) y exec (<code>HoneyPotExecProtocol</code>)</li>
+      <li><code>realm.py</code> / <code>avatar.py</code> — realm alternativo al shell</li>
+      <li><code>session.py</code> — adaptador ISession que instancia los protocolos LLM</li>
+    </ul>
+
+    <h3>Ollama y modelos locales</h3>
+    <p>
+      Ollama es un servidor local que sirve modelos LLM con una API compatible con OpenAI en <code>http://localhost:11434</code>. Permite ejecutar modelos de lenguaje sin enviar datos a la nube, lo que es crítico para los requerimientos de seguridad del proyecto. El modelo <strong>llama3.2:3b</strong> (Meta, 2024) pesa 2.0 GB y puede ejecutarse en CPU en un Mac con 16 GB RAM con latencia aceptable (~260 ms por respuesta).
+    </p>
+
+    <h3>Redes Docker y aislamiento</h3>
+    <p>
+      Docker permite crear redes <code>internal: true</code> que bloquean todo tráfico hacia internet (no hay gateway por defecto). Los contenedores en esa red sólo pueden comunicarse entre sí. Para que el honeypot LLM pueda alcanzar Ollama (en el host Mac), se necesita una segunda red no-interna donde <code>host.docker.internal</code> resuelve la IP del host.
+    </p>
+  </section>
+
+  <!-- 2. HISTORIAL -->
+  <section id="historial">
+    <div class="section-label">Sección 02</div>
+    <h2>Historial de trabajo</h2>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-week">W43</div>
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <h4>Infraestructura base (Miguel)</h4>
+          <ul>
+            <li>Creación de <code>docker-compose.yml</code> con red <code>safe-net</code> interna (<code>internal: true</code>)</li>
+            <li>Servicio <code>safe-honeypot</code>: imagen <code>cowrie/cowrie:latest</code>, backend shell, bind-mount de <code>cowrie.cfg</code> y <code>userdb.txt</code></li>
+            <li>Servicio <code>safe-attacker</code>: Ubuntu 22.04 con <code>openssh-client</code>, <code>sshpass</code>, <code>hydra</code>, <code>nmap</code>, <code>netcat</code>, <code>python3</code></li>
+            <li>Servicio <code>safe-logs</code>: alpine que mantiene el directorio de logs accesible desde el host</li>
+            <li><strong>Corrección crítica:</strong> la imagen Docker de Cowrie instala en <code>/cowrie/cowrie-git/</code> (no <code>/cowrie/</code>) — se corrigieron todos los bind-mounts</li>
+            <li><strong>Verificación:</strong> <code>sshpass -p "admin" ssh safe-honeypot -p 2222 "id && hostname"</code> retorna <code>uid=0(root)</code> / <code>prod-web-01</code></li>
+            <li>Logs de Condition A (<code>cowrie.json</code>) verificados con eventos <code>cowrie.command.input</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-week">W44</div>
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <h4>Honeypot híbrido LLM — Condition B (Miguel)</h4>
+          <ul>
+            <li>Selección del backend: <strong>Cowrie LLM backend</strong> (módulo oficial experimental)</li>
+            <li>Lectura del código fuente en el contenedor: <code>llm.py</code>, <code>protocol.py</code>, <code>session.py</code>, <code>realm.py</code>, <code>avatar.py</code>, <code>cowrie_plugin.py</code></li>
+            <li>Descubrimiento de la clave de configuración: <code>[honeypot] backend = llm</code></li>
+            <li>Creación de <code>honeypot/cowrie-llm.cfg</code> con sección <code>[llm]</code> apuntando a Ollama</li>
+            <li>Actualización de <code>docker-compose.yml</code>: nuevo servicio <code>safe-honeypot-llm</code>, nueva red <code>llm-net</code> no-interna, <code>extra_hosts: host.docker.internal:host-gateway</code></li>
+            <li>Creación de <code>logs-b/</code> para los logs de Condition B</li>
+            <li><strong>Bug 1 identificado y corregido:</strong> race condition EOF — el cliente SSH cierra stdin en ~3 ms antes de que llegue la respuesta LLM (~260 ms)</li>
+            <li><strong>Bug 2 identificado y corregido:</strong> ausencia de <code>cowrie.command.input</code> en los logs de comandos exec</li>
+            <li><strong>Bug 3 identificado y corregido:</strong> prefijo <code>assistant\n\n</code> en las respuestas de Ollama</li>
+            <li>Creación del archivo parche <code>honeypot/llm_protocol_patch.py</code> montado con volume bind</li>
+            <li><strong>Verificación final:</strong> ambas condiciones responden SSH, ambas escriben <code>cowrie.command.input</code> en sus respectivos <code>cowrie.json</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-week">W45</div>
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <h4>30 escenarios de ataque (Mario) — pendiente</h4>
+          <ul>
+            <li>Diseñar 30 escenarios mapeados a MITRE ATT&amp;CK</li>
+            <li>Construir el honeypot híbrido desde los artefactos de W44</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. DECISIONES -->
+  <section id="decisiones">
+    <div class="section-label">Sección 03</div>
+    <h2>Toma de decisiones y justificación de herramientas</h2>
+
+    <div class="decision-grid">
+
+      <div class="decision">
+        <div class="decision-title">Plataforma de virtualización: Docker Desktop en macOS</div>
+        <span class="decision-opted">✓ Elegido</span>
+        <p>El entorno disponible es un Mac con Apple Silicon y 16 GB RAM. Docker Desktop ofrece aislamiento de red (<code>internal: true</code>), reconstrucción rápida de entornos (<code>docker compose down &amp;&amp; up</code>) y no consume la RAM que necesitaría una VM completa para 2–3 nodos.</p>
+        <div class="decision-rejected"><strong>Alternativas descartadas:</strong> VirtualBox / VMware — no soportan Apple Silicon de forma nativa; KVM — requiere Linux host; cloud VMs — violan el requisito de red totalmente aislada y LLM local.</div>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Honeypot base: Cowrie</div>
+        <span class="decision-opted">✓ Elegido</span>
+        <p>Cowrie es el honeypot SSH de referencia académica (más de 3.5k citas en la literatura). Genera <code>cowrie.json</code> con esquema documentado, soporta TTY logging, captura hashes de archivos descargados, y tiene imagen Docker oficial mantenida. Imagen <code>cowrie/cowrie:latest</code> usa Cowrie 3.1.3 con Python 3.13.</p>
+        <div class="decision-rejected"><strong>Alternativas descartadas:</strong> Kippo — obsoleto, antecesor de Cowrie; HoneySSH — sin mantenimiento activo; implementación propia — semanas insuficientes.</div>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Motor LLM: Ollama con llama3.2:3b</div>
+        <span class="decision-opted">✓ Elegido</span>
+        <p>Los requerimientos del proyecto exigen LLM 100% local (sin llamadas a APIs cloud), sin capacidad de herramientas/funciones. Ollama expone una API compatible con OpenAI en <code>http://localhost:11434</code>. El modelo <strong>llama3.2:3b</strong> pesa 2.0 GB, corre en CPU en 16 GB RAM, responde en ~260 ms y no necesita GPU.</p>
+        <div class="decision-rejected"><strong>Alternativas descartadas:</strong> OpenAI GPT-4o — requiere API key y llamadas a internet (violación de requerimiento); Llama 3.1 8B — demasiado lento en CPU sin GPU; Mistral 7B — misma limitación de RAM; modelos cuantizados GGUF directos — Ollama ya los sirve, no hay ventaja en acceder directo.</div>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Backend híbrido: módulo LLM oficial de Cowrie</div>
+        <span class="decision-opted">✓ Elegido</span>
+        <p>Cowrie 3.1.x incluye un módulo <code>cowrie/llm/</code> experimental que activa un realm SSH alternativo con <code>backend = llm</code>. Al usar la misma imagen Docker, el mismo <code>cowrie.json</code>, el mismo protocolo SSH y la misma persona de host, se minimizan las variables entre Condición A y B. La comparación experimental es más limpia.</p>
+        <div class="decision-rejected"><strong>Alternativas descartadas:</strong> HoneyLLM — codebase separado, stack SSH diferente, formato de log diferente; HoneyGPT — código no completamente público; implementación propia — semana 45 es demasiado corta para construir desde cero y mantener la validez metodológica.</div>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Persona del host: prod-web-01 (Ubuntu + Apache + MySQL)</div>
+        <span class="decision-opted">✓ Elegido</span>
+        <p>Una persona de servidor web de producción es la más frecuente en campañas de compromiso masivo. Hostname descriptivo, banner SSH de Ubuntu 22.04 auténtico, credenciales débiles predecibles (<code>root/admin</code>, <code>admin/admin</code>, etc.) para maximizar la tasa de logins simulados en el experimento.</p>
+      </div>
+
+      <div class="decision">
+        <div class="decision-title">Estrategia de red: dos redes Docker</div>
+        <span class="decision-opted">✓ Elegido</span>
+        <p>El contenedor <code>safe-honeypot-llm</code> necesita simultáneamente: (a) estar aislado de internet para los atacantes (<code>safe-net</code>, <code>internal: true</code>), y (b) poder alcanzar Ollama en el host Mac (<code>llm-net</code>, bridge normal). La solución con dos redes mantiene el aislamiento sin proxy adicional.</p>
+        <div class="decision-rejected"><strong>Alternativa descartada:</strong> Proxy intermediario — añade un contenedor innecesario y una superficie de ataque extra en la red experimental.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. HALLAZGOS -->
+  <section id="hallazgos">
+    <div class="section-label">Sección 04</div>
+    <h2>Hallazgos técnicos y correcciones</h2>
+
+    <p>Durante la implementación del backend LLM se identificaron tres bugs no documentados en el módulo experimental de Cowrie. Las correcciones se aplican vía volume bind-mount de un archivo parche (<code>honeypot/llm_protocol_patch.py</code>) sobre el código original del contenedor.</p>
+
+    <div class="bug-list">
+
+      <div class="bug">
+        <div class="bug-tag">BUG-01 · protocol.py · HoneyPotExecProtocol</div>
+        <div class="bug-title">Race condition: EOF de stdin cierra el canal antes de que llegue la respuesta LLM</div>
+        <p><strong>Causa raíz:</strong> Al ejecutar un comando exec (<code>ssh host "id"</code>), el cliente SSH cierra su stdin inmediatamente después de enviar el comando. Esto dispara <code>HoneyPotBaseProtocol.eofReceived()</code>, que llama a <code>processEnded(exitCode=0)</code> en ~3 ms. El canal SSH se cierra. La respuesta LLM llega en ~260 ms, pero <code>self.terminal</code> ya es <code>None</code> y se descarta silenciosamente.</p>
+        <p><strong>Corrección:</strong> Override de <code>eofReceived</code> en <code>HoneyPotExecProtocol</code> para que sólo registre el estado sin cerrar el canal. El cierre correcto lo hace <code>_handle_exec_response</code> tras recibir la respuesta del LLM.</p>
+        <pre>def eofReceived(self) -> None:
+    # No llamar processEnded aquí — esperar respuesta LLM
+    self._stdin_eof = True</pre>
+      </div>
+
+      <div class="bug">
+        <div class="bug-tag">BUG-02 · protocol.py · _process_exec_with_llm</div>
+        <div class="bug-title">Comandos exec no se registran en cowrie.json</div>
+        <p><strong>Causa raíz:</strong> <code>_process_exec_with_llm</code> construye el prompt y envía la petición LLM pero nunca despacha el evento <code>cowrie.command.input</code>. Los comandos exec no aparecen en <code>cowrie.json</code>, sólo login y cierre de sesión.</p>
+        <p><strong>Corrección:</strong> Añadir dispatch explícito del evento antes de la llamada LLM, replicando el comportamiento de <code>HoneyPotBaseProtocol.lineReceived</code> para sesiones interactivas.</p>
+        <pre>self.events.dispatch(
+    "cowrie.command.input",
+    "CMD: %(input)s",
+    input=self.execcmd
+)</pre>
+      </div>
+
+      <div class="bug">
+        <div class="bug-tag">BUG-03 · protocol.py + cowrie-llm.cfg</div>
+        <div class="bug-title">Ollama antepone "assistant\n\n" a las respuestas</div>
+        <p><strong>Causa raíz:</strong> Cuando el cuerpo de la petición OpenAI contiene sólo un mensaje <code>system</code> sin mensaje <code>user</code>, el modelo llama3.2:3b genera la respuesta precedida de su etiqueta de rol (<code>assistant\n\n</code>). El módulo original construye el prompt exec como <code>[system_context]</code> sin mensaje de usuario.</p>
+        <p><strong>Corrección:</strong> (1) Añadir el comando exec como mensaje de usuario en el prompt: <code>prompt = [system_context, self.execcmd]</code>. (2) Añadir limpieza de etiquetas de rol en <code>strip_markdown()</code>.</p>
+        <pre># En strip_markdown():
+text = re.sub(r"^(assistant|user|system)\s*\n+",
+              "", text, flags=re.IGNORECASE)</pre>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5. ESTADO ACTUAL -->
+  <section id="estado">
+    <div class="section-label">Sección 05</div>
+    <h2>Estado actual del entorno</h2>
+
+    <div class="overflow-x: auto">
+    <table class="status-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Condición</th>
+          <th>Container</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Honeypot shell</td>
+          <td><span class="badge badge-a">A</span></td>
+          <td><code>safe-honeypot</code></td>
+          <td>✅ Operacional — logs A en <code>logs/cowrie.json</code></td>
+        </tr>
+        <tr>
+          <td>Honeypot LLM</td>
+          <td><span class="badge badge-b">B</span></td>
+          <td><code>safe-honeypot-llm</code></td>
+          <td>✅ Operacional — logs B en <code>logs-b/cowrie.json</code></td>
+        </tr>
+        <tr>
+          <td>Atacante</td>
+          <td>—</td>
+          <td><code>safe-attacker</code></td>
+          <td>✅ Herramientas: sshpass, hydra, nmap, nc, python3</td>
+        </tr>
+        <tr>
+          <td>Recolector de logs</td>
+          <td>—</td>
+          <td><code>safe-logs</code></td>
+          <td>✅ Ambos directorios de logs montados</td>
+        </tr>
+        <tr>
+          <td>Ollama (host)</td>
+          <td>—</td>
+          <td>proceso macOS</td>
+          <td>✅ llama3.2:3b · ~260 ms/resp · sin GPU</td>
+        </tr>
+        <tr>
+          <td>Parche protocolo</td>
+          <td><span class="badge badge-b">B</span></td>
+          <td><code>llm_protocol_patch.py</code></td>
+          <td>✅ Montado vía volume bind · 3 correcciones</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>Estructura de archivos final</h3>
+    <pre>SAFE/
+├── docker-compose.yml          # 4 servicios, 2 redes
+├── honeypot/
+│   ├── cowrie.cfg              # Condition A (backend=shell)
+│   ├── cowrie-llm.cfg          # Condition B (backend=llm, Ollama)
+│   ├── userdb.txt              # Credenciales compartidas
+│   └── llm_protocol_patch.py  # Parche: 3 bugs corregidos
+├── attacker/
+│   └── Dockerfile              # Ubuntu 22.04 + tools
+├── logs/                       # Condition A logs
+│   ├── cowrie.json
+│   └── cowrie.log
+└── logs-b/                     # Condition B logs
+    ├── cowrie.json
+    └── cowrie.log</pre>
+
+    <h3>Comandos de operación</h3>
+    <pre># Arrancar el entorno completo
+docker compose up -d
+
+# Probar Condition A (shell determinista)
+docker exec safe-attacker sshpass -p "admin" \
+  ssh -o StrictHostKeyChecking=no safe-honeypot -p 2222 "id"
+
+# Probar Condition B (LLM)
+docker exec safe-attacker sshpass -p "admin" \
+  ssh -o StrictHostKeyChecking=no safe-honeypot-llm -p 2222 "id"
+
+# Ver eventos en tiempo real (Condition A)
+tail -f logs/cowrie.json | python3 -m json.tool
+
+# Ver eventos en tiempo real (Condition B)
+tail -f logs-b/cowrie.json | python3 -m json.tool</pre>
+
+    <h3>Pendiente — Semanas 45–49</h3>
+    <div class="concept">
+      <p style="font-size:13.5px; color:var(--fg-2);">
+        <strong>W45 (Mario):</strong> Lista de 30 escenarios de ataque mapeados a MITRE ATT&amp;CK, construcción completa del honeypot híbrido.<br>
+        <strong>W46 (Miguel):</strong> Script de replay de escenarios, parser de métricas (<em>engagement depth</em>, <em>CTI richness</em>, latencia, coste), ejecución piloto.<br>
+        <strong>W47 (Mario):</strong> Ejecución de las 600 sesiones (30 escenarios × ≥10 repeticiones × 2 condiciones).<br>
+        <strong>W48–49:</strong> Procesamiento de datos y redacción del paper V0.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <span>SAFE Project · UPPA Máster Seguridad Informática · 2026</span>
+    <span>Generado automáticamente al final de la Semana 44</span>
+  </footer>
+
+</div>

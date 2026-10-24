@@ -1,0 +1,62 @@
+networks:
+  safe-net:
+    driver: bridge
+    internal: true   # no internet access — isolated lab network
+  llm-net:
+    driver: bridge   # non-internal: lets honeypot-llm reach host.docker.internal for Ollama
+
+services:
+
+  honeypot:
+    image: cowrie/cowrie:latest
+    container_name: safe-honeypot
+    hostname: prod-web-01
+    networks:
+      - safe-net
+    volumes:
+      - ./honeypot/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - ./honeypot/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
+      - ./logs:/cowrie/cowrie-git/var/log/cowrie
+    restart: unless-stopped
+
+  honeypot-llm:
+    image: cowrie/cowrie:latest
+    container_name: safe-honeypot-llm
+    hostname: prod-web-01
+    networks:
+      - safe-net   # attacker reaches it here (isolated)
+      - llm-net    # Ollama API calls go out through this network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./honeypot/cowrie-llm.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - ./honeypot/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
+      - ./honeypot/llm_protocol_patch.py:/cowrie/cowrie-git/src/cowrie/llm/protocol.py:ro
+      - ./logs-b:/cowrie/cowrie-git/var/log/cowrie
+    restart: unless-stopped
+
+  attacker:
+    build: ./attacker
+    container_name: safe-attacker
+    hostname: kali-attacker
+    networks:
+      - safe-net
+    depends_on:
+      - honeypot
+      - honeypot-llm
+    tty: true
+    stdin_open: true
+
+  log-collector:
+    image: alpine:latest
+    container_name: safe-logs
+    networks:
+      - safe-net
+    volumes:
+      - ./logs:/logs
+      - ./logs-b:/logs-b
+    command: sh -c "tail -F /logs/cowrie.json 2>/dev/null || while true; do sleep 5; done"
+    depends_on:
+      - honeypot
+      - honeypot-llm
+    restart: unless-stopped
