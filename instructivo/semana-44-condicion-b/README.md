@@ -32,6 +32,15 @@ writing manifest
 success
 ```
 
+Comprueba si el modelo corre en GPU o en CPU (ver [Etapa 0](../00-preparacion-host/), punto B5):
+
+```bash
+ollama run llama3.2:3b "hola" >/dev/null
+curl -s localhost:11434/api/ps | grep -o '"size_vram":[0-9]*'
+# "size_vram":0         → solo CPU: la Condición B tardará ~10–15 s por comando
+# "size_vram":<número>  → usa GPU (o la memoria unificada del Mac)
+```
+
 ## Paso 2 — Comprobar la API de Ollama
 
 El backend LLM de Cowrie habla con una API compatible con OpenAI. Comprobarla antes evita diagnosticar a ciegas después:
@@ -46,7 +55,7 @@ curl -s http://localhost:11434/v1/chat/completions \
 ```
 
 ```
-# Salida esperada:
+# Salida esperada (el texto puede variar un poco, p. ej. "Ok"):
 "content": "ok"
 ```
 
@@ -130,7 +139,7 @@ docker logs safe-honeypot 2>&1 | grep "Cowrie Version"
 # Salida esperada: ... Cowrie Version 3.1.3
 ```
 
-> **Versión:** los parches están escritos para **Cowrie 3.1.3**. La imagen es `cowrie/cowrie:latest`, así que una versión más nueva puede cambiar el código; en ese caso los scripts de los pasos 6 y 7 fallan con un mensaje claro en lugar de dejar un archivo roto.
+> **Versión:** los parches están escritos para **Cowrie 3.1.3**, y por eso el `docker-compose.yml` fija la imagen `cowrie/cowrie:3.1.3` en lugar de `latest` (Cowrie publica versiones casi cada semana). Si algún día se sube la versión, los scripts de los pasos 6 y 7 fallan con un mensaje claro en lugar de dejar un archivo roto.
 
 ```bash
 docker cp safe-honeypot:/cowrie/cowrie-git/src/cowrie/llm/protocol.py honeypot/llm_protocol_patch.py
@@ -267,7 +276,7 @@ networks:
 services:
 
   honeypot:
-    image: cowrie/cowrie:latest
+    image: cowrie/cowrie:3.1.3   # pinned: honeypot/ patches target Cowrie 3.1.3
     container_name: safe-honeypot
     hostname: prod-web-01
     networks:
@@ -279,7 +288,7 @@ services:
     restart: unless-stopped
 
   honeypot-llm:
-    image: cowrie/cowrie:latest
+    image: cowrie/cowrie:3.1.3   # pinned: honeypot/ patches target Cowrie 3.1.3
     container_name: safe-honeypot-llm
     hostname: prod-web-01
     networks:

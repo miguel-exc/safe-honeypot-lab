@@ -34,6 +34,8 @@ En Linux hay que hacer a mano tres cosas que en macOS resuelve Docker Desktop.
 
 ### B1. Docker Engine y el plugin Compose
 
+Si `docker --version` y `docker compose version` ya funcionan, salta este paso. Si tienes Docker instalado desde el repositorio oficial de Docker (`docker-ce`), no instales `docker.io` encima: solo falta el plugin, que en ese caso se llama `docker-compose-plugin`.
+
 ```bash
 sudo apt update
 sudo apt install -y docker.io docker-compose-v2
@@ -91,12 +93,7 @@ ss -ltn | grep 11434
 
 ### B5. Advertencia de rendimiento
 
-Si la máquina no tiene una GPU soportada por Ollama (NVIDIA, o AMD con ROCm), el modelo corre en CPU. Comprueba:
-
-```bash
-ollama run llama3.2:3b "hola" >/dev/null; curl -s localhost:11434/api/ps | grep -o '"size_vram":[0-9]*'
-# "size_vram":0  → el modelo corre solo en CPU
-```
+Si la máquina no tiene una GPU soportada por Ollama (NVIDIA, o AMD con ROCm), el modelo corre en CPU. Se comprueba en el paso 1 de la [Semana 44](../semana-44-condicion-b/), una vez descargado el modelo.
 
 En CPU la Condición B tarda **~10–15 s por comando** en lugar de ~300 ms. Sirve para desarrollar y probar, pero **las mediciones de latencia y la recolección de la Semana 47 deben hacerse en la misma máquina de referencia** (el Mac) para que los resultados sean comparables.
 

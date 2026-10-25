@@ -25,12 +25,12 @@ Comparar un honeypot SSH convencional (Cowrie shell, **Condición A**) contra un
 ├── logs-b/                     # Logs Condición B (gitignored)
 └── docs/
     ├── reporte_fase1.html      # Informe técnico Semanas 43–44
-    └── instructivo_semana44.html  # Guía paso a paso para recrear el entorno
+    └── instructivo_semana44.html  # Enlace a instructivo/ (la guía se movió ahí)
 ```
 
 ## Requisitos
 
-- Docker Desktop (macOS, Apple Silicon o Intel)
+- Docker Desktop (macOS, Apple Silicon o Intel), o Docker Engine + Compose en Linux (ver [`instructivo/00-preparacion-host/`](instructivo/00-preparacion-host/))
 - [Ollama](https://ollama.com) con modelo `llama3.2:3b`
 - 16 GB RAM mínimo
 

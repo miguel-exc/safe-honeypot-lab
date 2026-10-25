@@ -17,14 +17,32 @@
 
 ---
 
+## Paso 0 — Apagar cualquier copia anterior del laboratorio
+
+Los contenedores tienen nombres fijos (`safe-honeypot`, `safe-attacker`, …), así que no pueden existir dos copias del laboratorio a la vez. Comprueba si hay alguna corriendo:
+
+```bash
+docker ps -a --filter name=safe- --format '{{.Names}}  {{.Status}}'
+```
+
+Si la lista no está vacía, ve a la carpeta de esa copia y apágala (sus logs en `logs/` y `logs-b/` no se borran):
+
+```bash
+cd <carpeta-de-la-copia-anterior>
+docker compose down
+cd -
+```
+
 ## Paso 1 — Crear la estructura de carpetas
+
+Elige una carpeta que **no** contenga ya un `safe-honeypot-lab/` (por ejemplo, si ya clonaste el repositorio en tu carpeta personal, trabaja en otra como `~/prueba/`):
 
 ```bash
 mkdir -p safe-honeypot-lab/{honeypot,attacker,logs}
 cd safe-honeypot-lab
 ```
 
-Todos los pasos siguientes se ejecutan dentro de `safe-honeypot-lab/`.
+Todos los pasos siguientes se ejecutan dentro de `safe-honeypot-lab/`. El nombre importa: Docker Compose usa el nombre de la carpeta como prefijo de las redes (`safe-honeypot-lab_safe-net`).
 
 ## Paso 2 — Imagen del atacante
 
@@ -149,7 +167,7 @@ networks:
 services:
 
   honeypot:
-    image: cowrie/cowrie:latest
+    image: cowrie/cowrie:3.1.3   # pinned: honeypot/ patches target Cowrie 3.1.3
     container_name: safe-honeypot
     hostname: prod-web-01
     networks:
@@ -200,7 +218,7 @@ La primera vez tarda unos minutos (descarga la imagen de Cowrie y construye la d
 # Salida esperada:
 NAME            IMAGE                        STATUS
 safe-attacker   safe-honeypot-lab-attacker   Up ...
-safe-honeypot   cowrie/cowrie:latest         Up ...
+safe-honeypot   cowrie/cowrie:3.1.3          Up ...
 safe-logs       alpine:latest                Up ...
 ```
 
@@ -276,3 +294,4 @@ Continúa con la [Semana 44](../semana-44-condicion-b/).
 | `Permission denied, please try again` en SSH | Contraseña no listada en `userdb.txt` | Usar una de las del paso 3 (p. ej. `root` / `admin`) |
 | `ssh: Could not resolve hostname safe-honeypot` | El atacante no está en `safe-net` o el honeypot está caído | `docker compose ps` y `docker network inspect safe-honeypot-lab_safe-net` |
 | `logs/cowrie.json` no existe | Cowrie aún no arrancó o no puede escribir | Esperar 10 s; si sigue, ver `docker logs safe-honeypot` |
+| `Conflict. The container name "/safe-honeypot" is already in use` | Sigue existiendo un contenedor de otra copia del laboratorio | Repetir el paso 0; si no encuentras la carpeta, `docker rm -f safe-honeypot safe-honeypot-llm safe-attacker safe-logs` |
