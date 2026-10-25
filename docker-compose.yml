@@ -32,6 +32,7 @@ services:
       - ./honeypot/cowrie-llm.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
       - ./honeypot/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
       - ./honeypot/llm_protocol_patch.py:/cowrie/cowrie-git/src/cowrie/llm/protocol.py:ro
+      - ./honeypot/llm_session_patch.py:/cowrie/cowrie-git/src/cowrie/llm/session.py:ro
       - ./logs-b:/cowrie/cowrie-git/var/log/cowrie
     restart: unless-stopped
 

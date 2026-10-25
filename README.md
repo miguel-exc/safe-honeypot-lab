@@ -16,7 +16,8 @@ Comparar un honeypot SSH convencional (Cowrie shell, **Condición A**) contra un
 │   ├── cowrie.cfg              # Condición A (backend=shell)
 │   ├── cowrie-llm.cfg          # Condición B (backend=llm, Ollama)
 │   ├── userdb.txt              # Credenciales SSH compartidas
-│   └── llm_protocol_patch.py  # Parche: 3 bugs corregidos en el módulo LLM
+│   ├── llm_protocol_patch.py  # Parche: BUG-01..03 en el módulo LLM
+│   └── llm_session_patch.py   # Parche: BUG-04 (TTY log de sesiones exec)
 ├── attacker/
 │   └── Dockerfile              # Ubuntu 22.04 + herramientas de ataque
 ├── logs/                       # Logs Condición A (gitignored)
@@ -85,5 +86,6 @@ Ver `docs/instructivo_semana44.html` para la guía completa paso a paso.
 1. **BUG-01** — Race condition EOF: el canal SSH se cerraba antes de recibir la respuesta LLM
 2. **BUG-02** — Los comandos exec no se registraban en `cowrie.json`
 3. **BUG-03** — Ollama anteponía `"assistant\n\n"` a sus respuestas
+4. **BUG-04** — Las sesiones exec se etiquetaban como interactivas en el TTY log: el comando no se registraba, todos los logs tenían el hash `sha256("")` y desde la segunda sesión se descartaban como duplicados (parche en `honeypot/llm_session_patch.py`)
 
 Ver `docs/reporte_fase1.html` para análisis detallado.
