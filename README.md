@@ -20,6 +20,7 @@ Comparar un honeypot SSH convencional (Cowrie shell, **Condición A**) contra un
 │   └── llm_session_patch.py   # Parche: BUG-04 (TTY log de sesiones exec)
 ├── attacker/
 │   └── Dockerfile              # Ubuntu 22.04 + herramientas de ataque
+├── instructivo/                # Guía de montaje manual, una carpeta por etapa/semana
 ├── logs/                       # Logs Condición A (gitignored)
 ├── logs-b/                     # Logs Condición B (gitignored)
 └── docs/
@@ -54,7 +55,7 @@ docker exec safe-attacker sshpass -p "admin" \
   ssh -o StrictHostKeyChecking=no safe-honeypot-llm -p 2222 "id"
 ```
 
-Ver `docs/instructivo_semana44.html` para la guía completa paso a paso.
+Para montar el entorno a mano desde cero, etapa por etapa, ver [`instructivo/`](instructivo/).
 
 ## Arquitectura de red
 
