@@ -5,4 +5,4 @@
 TARGET="${1:-safe-honeypot}"
 SSH="sshpass -p admin ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${TARGET} -p 2222"
 echo "=== S24 Process Masquerade — ${TARGET} ==="
-$SSH "cp /bin/bash /tmp/sshd; ls -la /tmp/sshd; cp /bin/bash /usr/local/bin/kworker; ls -la /usr/local/bin/kworker" && echo "[OK]" || echo "[FAIL]"
+timeout ${TIMEOUT:-45} $SSH "cp /bin/bash /tmp/sshd; ls -la /tmp/sshd; cp /bin/bash /usr/local/bin/kworker; ls -la /usr/local/bin/kworker" && echo "[OK]" || echo "[FAIL]"

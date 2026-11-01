@@ -5,4 +5,4 @@
 TARGET="${1:-safe-honeypot}"
 SSH="sshpass -p admin ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${TARGET} -p 2222"
 echo "=== S18 Sudo Enumeration — ${TARGET} ==="
-$SSH "sudo -l; cat /etc/sudoers 2>/dev/null; cat /etc/sudoers.d/* 2>/dev/null" && echo "[OK]" || echo "[FAIL]"
+timeout ${TIMEOUT:-45} $SSH "sudo -l; cat /etc/sudoers 2>/dev/null; cat /etc/sudoers.d/* 2>/dev/null; exit 0" && echo "[OK]" || echo "[FAIL]"

@@ -5,4 +5,4 @@
 TARGET="${1:-safe-honeypot}"
 SSH="sshpass -p admin ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${TARGET} -p 2222"
 echo "=== S08 Environment & Config — ${TARGET} ==="
-$SSH "env; cat /etc/os-release; cat /proc/version; df -h; free -m" && echo "[OK]" || echo "[FAIL]"
+timeout ${TIMEOUT:-45} $SSH "env; cat /etc/os-release; cat /proc/version; df -h; free -m" && echo "[OK]" || echo "[FAIL]"

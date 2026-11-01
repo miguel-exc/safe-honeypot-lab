@@ -4,7 +4,14 @@
 TARGET="${1:-safe-honeypot}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "=== RUN ALL — ${TARGET} ==="
+# LLM backend runs Ollama per command; allow more time (default 45s, LLM 180s)
+if echo "$TARGET" | grep -q "llm"; then
+    export TIMEOUT=180
+else
+    export TIMEOUT=45
+fi
+
+echo "=== RUN ALL — ${TARGET} (timeout ${TIMEOUT}s/scenario) ==="
 echo ""
 
 passed=0
@@ -17,8 +24,10 @@ for script in $(ls "${SCRIPT_DIR}"/s[0-9][0-9]_*.sh | sort); do
     output=$(bash "$script" "$TARGET" 2>&1)
     end=$(date +%s%3N)
     elapsed=$(( end - start ))
-    elapsed_s=$(printf "%.1f" "$(echo "scale=1; $elapsed / 1000" | bc)")
+    elapsed_s=$(awk "BEGIN {printf \"%.1f\", $elapsed / 1000}")
 
+    # [OK] = SSH connected and command ran (even if honeypot returned "not found")
+    # [FAIL] = SSH connection itself failed (exit 255)
     if echo "$output" | grep -q "\[OK\]"; then
         status="OK"
         passed=$(( passed + 1 ))

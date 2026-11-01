@@ -5,4 +5,4 @@
 TARGET="${1:-safe-honeypot}"
 SSH="sshpass -p admin ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ${TARGET} -p 2222"
 echo "=== S02 Network Discovery — ${TARGET} ==="
-$SSH "ip a || ifconfig; ip route; ss -tulnp || netstat -tulnp" && echo "[OK]" || echo "[FAIL]"
+timeout ${TIMEOUT:-45} $SSH "ip a || ifconfig; ip route; ss -tulnp || netstat -tulnp" && echo "[OK]" || echo "[FAIL]"
