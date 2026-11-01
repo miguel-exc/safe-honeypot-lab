@@ -45,6 +45,8 @@ services:
     depends_on:
       - honeypot
       - honeypot-llm
+    volumes:
+      - ./scenarios:/scenarios:ro
     tty: true
     stdin_open: true
 
